@@ -23,6 +23,8 @@ abstract class CarouselSliderController {
 
   void stopAutoPlay();
 
+  PageController? get pageController;
+
   factory CarouselSliderController() => CarouselSliderControllerImpl();
 }
 
@@ -46,6 +48,9 @@ class CarouselSliderControllerImpl implements CarouselSliderController {
 
   @override
   Future<Null> get onReady => _readyCompleter.future;
+
+  @override
+  PageController? get pageController => _state?.pageController;
 
   /// Animates the controlled [CarouselSlider] to the next page.
   ///
@@ -93,10 +98,10 @@ class CarouselSliderControllerImpl implements CarouselSliderController {
     if (pageController == null || !pageController.hasClients) {
       return;
     }
-    
+
     final currentPage = pageController.page?.toInt() ?? _state!.realPage;
-    final index = getRealIndex(currentPage,
-        _state!.realPage - _state!.initialPage, _state!.itemCount);
+    final index = getRealIndex(
+        currentPage, _state!.realPage - _state!.initialPage, _state!.itemCount);
 
     _setModeController();
     final int pageToJump = currentPage + page - index;
@@ -114,15 +119,15 @@ class CarouselSliderControllerImpl implements CarouselSliderController {
     if (pageController == null || !pageController.hasClients) {
       return;
     }
-    
+
     final bool isNeedResetTimer = _state!.options.pauseAutoPlayOnManualNavigate;
     if (isNeedResetTimer) {
       _state!.onResetTimer();
     }
-    
+
     final currentPage = pageController.page?.toInt() ?? _state!.realPage;
-    final index = getRealIndex(currentPage,
-        _state!.realPage - _state!.initialPage, _state!.itemCount);
+    final index = getRealIndex(
+        currentPage, _state!.realPage - _state!.initialPage, _state!.itemCount);
     int smallestMovement = page - index;
     if (_state!.options.enableInfiniteScroll &&
         _state!.itemCount != null &&
@@ -135,10 +140,8 @@ class CarouselSliderControllerImpl implements CarouselSliderController {
       }
     }
     _setModeController();
-    await pageController.animateToPage(
-        currentPage + smallestMovement,
-        duration: duration!,
-        curve: curve!);
+    await pageController.animateToPage(currentPage + smallestMovement,
+        duration: duration!, curve: curve!);
     if (isNeedResetTimer) {
       _state!.onResumeTimer();
     }
